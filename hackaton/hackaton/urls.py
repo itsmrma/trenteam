@@ -19,5 +19,5 @@ from myapp import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('about/', views.about, name='about'),
+    path('prova', views.prova, name='prova'),
 ]

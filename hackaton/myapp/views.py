@@ -6,3 +6,6 @@ def home(request):
         'age' : 10,
     }
     return render(request, 'home.html', context)
+
+def prova(request):
+    return render(request, 'prova.html')
