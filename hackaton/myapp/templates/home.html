@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ title }}</title>
+    <title>{{ name }}</title>
 </head>
 <body>
     <h1>Welcome to the Home Page!</h1>
     <p>This is a Django-powered HTML page.</p>
+    {% if age > 18 %}
+        <p>You are an adult.</p>
+    {% else %}
+        <p>You are a minor.</p>
+    {% endif %}
 </body>
 </html>
