@@ -18,6 +18,5 @@ from django.urls import path
 from myapp import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('prova', views.prova, name='prova'),
+    path('', views.upload_file, name='upload_file')
 ]
