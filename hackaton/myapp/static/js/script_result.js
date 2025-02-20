@@ -1,16 +1,30 @@
-document.getElementById('searchButton').addEventListener('click', function() {
-    const keywords = document.getElementById('keywordInput').value.split(',').map(keyword => keyword.trim());
-    fetch('/search_keywords/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
-      },
-      body: JSON.stringify({ keywords: keywords })
-    })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('summaryText').textContent = data.summary || 'Nessun risultato trovato.';
-    })
-    .catch(error => console.error('Errore:', error));
+document.getElementById('keywordInput').addEventListener('input', function() {
+    const inputText = document.getElementById('keywordInput').value;
+  
+    // Separare le parole dalla virgola
+    const keywords = inputText.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
+  
+    // Creare una stringa HTML con le parole evidenziate
+    const highlightedKeywords = keywords.map(keyword => `<span class="highlighted">${keyword}</span>`).join(', ');
+  
+    // Mostra l'elenco separato da virgola nell'input
+    document.getElementById('keywordInput').value = keywords.join(', ');
+  
+    // Aggiornare la visualizzazione nell'anteprima delle parole evidenziate
+    document.getElementById('keywordPreview').innerHTML = highlightedKeywords;
+  });
+  
+  // Aggiungi un listener per gestire il comportamento della virgola
+  document.getElementById('keywordInput').addEventListener('keyup', function(event) {
+    const inputText = document.getElementById('keywordInput').value;
+  
+    // Se la virgola viene premuta
+    if (event.key === ',') {
+      const keywords = inputText.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
+  
+      // Aggiungi uno spazio dopo la virgola se non è presente
+      if (keywords.length > 0) {
+        document.getElementById('keywordInput').value = keywords.join(', ') + ', ';
+      }
+    }
   });
