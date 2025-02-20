@@ -52,7 +52,7 @@ function showFile() {
     file = null;
   }
 }
-
+/*
 // Submit the form when the "INVIA" button is clicked
 submitButton.addEventListener("click", () => {
   if (!file) {
@@ -81,4 +81,4 @@ submitButton.addEventListener("click", () => {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
     });
-});
+});*/

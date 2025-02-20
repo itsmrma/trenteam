@@ -9,8 +9,7 @@ from PIL import Image
 import pytesseract
 import docx
 from asn1crypto import cms, pem
-
-text=''
+from django.core.files.storage import FileSystemStorage
 
 
 def extract_text_from_pdf(file_path):
@@ -52,50 +51,19 @@ def extract_original_file(p7m_file_path):
     else:
         raise ValueError("The encapsulated content is not of type 'data'.")
 
-def upload_file(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                # Save the uploaded .p7m file
-                uploaded_file = request.FILES['file']
-                file_path = default_storage.save(uploaded_file.name, ContentFile(uploaded_file.read()))
-
-                # Extract the original file from the .p7m
-                original_file = extract_original_file(file_path)
-                if not original_file:
-                    return JsonResponse({"success": False, "error": "Failed to extract the original file."})
-
-                # Save the original file temporarily
-                original_file_path = default_storage.save('original_file', ContentFile(original_file))
-                file_type = magic.from_file(original_file_path, mime=True)
-
-                # Extract text based on file type
-                text = ""
-                if file_type == 'application/pdf':
-                    text = extract_text_from_pdf(original_file_path)
-                elif file_type in ['image/jpeg', 'image/png']:
-                    text = extract_text_from_image(original_file_path)
-                elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                    text = extract_text_from_docx(original_file_path)
-                else:
-                    return JsonResponse({"success": False, "error": "Unsupported file type."})
-
-                # Clean up temporary files
-                default_storage.delete(file_path)
-                default_storage.delete(original_file_path)
-                # Return the extracted text
-                return JsonResponse({"success": True, "extracted_text": text})
-            except Exception as e:
-                return JsonResponse({"success": False, "error": str(e)})
-        else:
-            return JsonResponse({"success": False, "error": "Invalid form submission."})
-    else:
-        form = UploadFileForm()
-    return render(request, 'upload.html', {'form': form})
-
 def result(request):
     #extracted_text = request.GET.get('extracted_text', '')
-    print(text)
     print("PIPPO")
-    return render(request, 'result.html', {'extracted_text': text})
+    return render(request, 'result.html', {'extracted_text': 'CIAOOO'})
+
+
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = request.FILES['file']  # Recupera il file
+        fs = FileSystemStorage()
+        filename = fs.save(uploaded_file.name, uploaded_file)  # Salva il file
+        file_url = fs.url(filename)  # Ottieni l'URL del file salvato
+        return render(request, 'upload.html', {'file_url': file_url})
+
+    return render(request, 'upload.html')
