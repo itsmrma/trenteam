@@ -1,11 +1,33 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Extracted Text</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AATO Smart Analyzer</title>
+    <link rel="stylesheet" href="{% static 'css/style_result.css' %}">
 </head>
 <body>
-    <h1>Extracted Text</h1>
-    <pre>{{ extracted_text }}</pre>
-    <a href="/">Upload another file</a>
+  <div class="container">
+    <div class="left-panel">
+      <div class="search-box">
+        <input type="text" id="keywordInput" placeholder="Inserisci parole chiave, separate da virgola" />
+        <button id="searchButton" class="search-button">Cerca</button>
+      </div>
+      <div class="summary">
+        <h2>Riassunto</h2>
+        <pre id="summaryText"></pre>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="preview-box">
+        <h2>Anteprima del file</h2>
+        <iframe id="filePreview" width="100%" height="100%"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/script_result.js' %}"></script>
 </body>
 </html>
