@@ -23,7 +23,7 @@ body {
 }
 
 .header .logo {
-  width: 200px; /* Puoi modificare la dimensione dell'immagine */
+  width: 200px;
   height: auto;
   margin-bottom: 10px;
 }
@@ -73,7 +73,33 @@ body {
   text-align: center;
 }
 
-.drag-area button {
+.drag-area button, .drag-area #submitButton {
+  padding: 12px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+  margin-top: 10px;
+}
+
+.drag-area button:hover, .drag-area #submitButton:hover {
+  background: #357ab7;
+}
+
+.drag-area img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.submit-button {
+  margin-top: 20px;
   padding: 12px 30px;
   font-size: 18px;
   font-weight: 600;
@@ -86,13 +112,6 @@ body {
   box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
 }
 
-.drag-area button:hover {
+.submit-button:hover {
   background: #357ab7;
-}
-
-.drag-area img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  border-radius: 10px;
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag & Drop or Browse: File Upload | CodingNepal</title>
+    <title>AATO Smart Analyzer</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -16,18 +16,21 @@
 
     <div class="drag-area">
       <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
-      <header>Drag & Drop to Upload File</header>
-      <span>OR</span>
+      <header>Trascina e rilascia per caricare il file</header>
+      <span>OPPURE</span>
       <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
         {% csrf_token %}
-        <button type="button" id="browseButton">Browse File</button>
+        <button type="button" id="browseButton">Sfoglia file</button>
         <input type="file" name="file" id="fileInput" hidden accept=".p7m">
       </form>
     </div>
 
-    <!-- Display extracted text here -->
+    <!-- Pulsante INVIA fuori dal box -->
+    <button id="submitButton" class="submit-button">INVIA</button>
+
+    <!-- Area per mostrare il testo estratto -->
     <div id="result" class="result-area" style="display: none;">
-      <h2>Extracted Text</h2>
+      <h2>Testo Estratto</h2>
       <pre id="extractedText"></pre>
     </div>
   </div>
