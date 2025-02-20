@@ -18,8 +18,17 @@
       <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
       <header>Drag & Drop to Upload File</header>
       <span>OR</span>
-      <button>Browse File</button>
-      <input type="file" hidden>
+      <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
+        {% csrf_token %}
+        <button type="button" id="browseButton">Browse File</button>
+        <input type="file" name="file" id="fileInput" hidden accept=".p7m">
+      </form>
+    </div>
+
+    <!-- Display extracted text here -->
+    <div id="result" class="result-area" style="display: none;">
+      <h2>Extracted Text</h2>
+      <pre id="extractedText"></pre>
     </div>
   </div>
 

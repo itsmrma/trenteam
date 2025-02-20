@@ -17,7 +17,7 @@ def inviaRichiesta(file,testo,keywords):
     genai.configure(api_key="AIzaSyATCyWtU-wJMO97rPf7xHr0pOJrgTEE8ds") #Sostituisci con la tua chiave API
     for i in file:
         file_mime.update({"mime_type": i[1], "data": i[0]})
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
     prompt_parts = [
         "dimmi cosa vedi in questi file: ",
         #{"mime_type": "image/jpeg", "data": immagini}
