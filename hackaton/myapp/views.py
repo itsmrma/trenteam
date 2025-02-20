@@ -10,6 +10,9 @@ import pytesseract
 import docx
 from asn1crypto import cms, pem
 
+text=''
+
+
 def extract_text_from_pdf(file_path):
     reader = PdfReader(file_path)
     text = ""
@@ -81,7 +84,6 @@ def upload_file(request):
                 # Clean up temporary files
                 default_storage.delete(file_path)
                 default_storage.delete(original_file_path)
-
                 # Return the extracted text
                 return JsonResponse({"success": True, "extracted_text": text})
             except Exception as e:
@@ -93,5 +95,7 @@ def upload_file(request):
     return render(request, 'upload.html', {'form': form})
 
 def result(request):
-    extracted_text = request.GET.get('extracted_text', '')
-    return render(request, 'result.html', {'extracted_text': extracted_text})
+    #extracted_text = request.GET.get('extracted_text', '')
+    print(text)
+    print("PIPPO")
+    return render(request, 'result.html', {'extracted_text': text})
