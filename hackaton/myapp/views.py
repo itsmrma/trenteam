@@ -91,13 +91,3 @@ def upload_file(request):
     else:
         form = UploadFileForm()
     return render(request, 'upload.html', {'form': form})
-
-def home(request):
-    context = {
-        'name' : 'Hackaton',
-        'age' : 10,
-    }
-    return render(request, 'home.html', context)
-
-def prova(request):
-    return render(request, 'prova.html')

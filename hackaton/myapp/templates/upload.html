@@ -1,16 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drag & Drop or Browse: File Upload | CodingNepal</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <img src="foto/aato_logo.png" alt="Logo" class="logo">
+      <img src="{% static 'foto/aato_logo.png' %}" alt="Logo" class="logo">
       <h1>AATO Smart Analyzer</h1>
     </div>
 
@@ -23,6 +23,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
