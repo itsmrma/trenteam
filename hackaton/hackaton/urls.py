@@ -19,5 +19,5 @@ from myapp import views
 
 urlpatterns = [
     path('', views.upload_file, name='upload_file'),
-    path('result',views.upload_file,name='result')
+    path('result',views.result,name='result')
 ]

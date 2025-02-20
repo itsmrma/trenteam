@@ -91,3 +91,7 @@ def upload_file(request):
     else:
         form = UploadFileForm()
     return render(request, 'result.html', {'form': form})
+
+def result(request):
+    
+    return render(request, 'result.html')
