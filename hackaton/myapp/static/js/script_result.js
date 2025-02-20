@@ -5,7 +5,7 @@ document.getElementById('keywordInput').addEventListener('input', function() {
     const keywords = inputText.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
   
     // Creare una stringa HTML con le parole evidenziate
-    const highlightedKeywords = keywords.map(keyword => `<span class="highlighted">${keyword}</span>`).join(', ');
+    const highlightedKeywords = keywords.map(keyword => `<span class="highlighted">${keyword}</span>`).join(' ');
   
     // Mostra l'elenco separato da virgola nell'input
     document.getElementById('keywordInput').value = keywords.join(', ');
