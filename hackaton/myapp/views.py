@@ -54,16 +54,29 @@ def extract_original_file(p7m_file_path):
 def result(request):
     #extracted_text = request.GET.get('extracted_text', '')
     print("PIPPO")
+    print(request.method)
+    print(request.FILES.get('file'))
     return render(request, 'result.html', {'extracted_text': 'CIAOOO'})
 
+from django.shortcuts import render
+from django.core.files.storage import FileSystemStorage
 
-
-def upload_file(request):
+def home(request):
     if request.method == 'POST' and request.FILES.get('file'):
-        uploaded_file = request.FILES['file']  # Recupera il file
+        uploaded_file = request.FILES['file']  # Ottiene il file inviato
         fs = FileSystemStorage()
         filename = fs.save(uploaded_file.name, uploaded_file)  # Salva il file
-        file_url = fs.url(filename)  # Ottieni l'URL del file salvato
-        return render(request, 'upload.html', {'file_url': file_url})
+        file_url = fs.url(filename)  # Ottiene l'URL del file salvato
 
-    return render(request, 'upload.html')
+        return render(request, 'result.html', {'file_url': file_url})  # Mostra il file
+
+    return render(request, 'upload.html')  # Se non c'è file, mostra solo il form
+
+
+
+
+
+
+
+
+

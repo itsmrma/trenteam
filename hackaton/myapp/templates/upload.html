@@ -18,17 +18,16 @@
       <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
       <header>Trascina e rilascia per caricare il file</header>
       <span>OPPURE</span>
-      <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
+      <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'home' %}">
         {% csrf_token %}
         <button type="button" id="browseButton">Sfoglia file</button>
         <input type="file" name="file" id="fileInput" hidden accept=".p7m">
-      </form>
-    </div>
+      
 
     <!-- Pulsante INVIA fuori dal box -->
-    <button id="submitButton" class="submit-button" ><a href="{% url 'result' %}">INVIA</a></button>
-    
-
+    <button class="submit-button" type="submit">INVIA</button>
+      </form>
+    </div>
     <!-- Area per mostrare il testo estratto -->
     <div id="result" class="result-area" style="display: none;">
       <h2>Testo Estratto</h2>

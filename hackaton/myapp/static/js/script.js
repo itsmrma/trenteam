@@ -52,33 +52,5 @@ function showFile() {
     file = null;
   }
 }
-/*
-// Submit the form when the "INVIA" button is clicked
-submitButton.addEventListener("click", () => {
-  if (!file) {
-    alert("Please select a file first.");
-    return;
-  }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("csrfmiddlewaretoken", document.querySelector("[name=csrfmiddlewaretoken]").value);
 
-  fetch(uploadForm.action, {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // Redirect to result.html with the extracted text
-        window.location.href = `/result?extracted_text=${encodeURIComponent(data.extracted_text)}`;
-      } else {
-        alert(data.error || "An error occurred while processing the file.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("An error occurred while uploading the file.");
-    });
-});*/
