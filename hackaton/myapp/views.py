@@ -90,4 +90,4 @@ def upload_file(request):
             return JsonResponse({"success": False, "error": "Invalid form submission."})
     else:
         form = UploadFileForm()
-    return render(request, 'upload.html', {'form': form})
+    return render(request, 'result.html', {'form': form})
