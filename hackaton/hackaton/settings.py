@@ -135,3 +135,7 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+SECURE_BROWSER_XSS_FILTER = False  # Disabilita il filtro XSS del browser (se serve)
+X_FRAME_OPTIONS = 'ALLOWALL'  # Permette di incorporare il sito in qualsiasi iframe

@@ -15,7 +15,7 @@ body {
 header {
   width: 100%;
   background-color: #4a90e2;
-  padding: 10px 0; /* Barra piccola */
+  padding: 10px 0;
   text-align: center;
 }
 
@@ -42,15 +42,16 @@ h1 {
   display: flex;
   flex-direction: row;
   width: 100%;
-  max-width: 1200px;
-  height: 100vh; /* Impostato per coprire tutta l'altezza della pagina */
+  max-width: 100vw;
+  height: calc(100vh - 50px);
 }
 
 .left-panel, .right-panel {
-  width: 50%;  /* Suddivide la pagina a metà */
+  width: 50vw;
+  height: 100%;
   padding: 20px;
-  height: 100%;  /* Assicura che i pannelli occupino tutta l'altezza della finestra */
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .left-panel {
@@ -119,6 +120,18 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 iframe {
@@ -137,11 +150,11 @@ iframe {
 /* Media query per dispositivi piccoli */
 @media (max-width: 768px) {
   .container {
-    flex-direction: column; /* Imposta una colonna invece di una riga */
+    flex-direction: column;
   }
 
   .left-panel, .right-panel {
-    width: 100%;  /* Occupano il 100% della larghezza */
+    width: 100%;
     padding: 10px;
   }
 }
