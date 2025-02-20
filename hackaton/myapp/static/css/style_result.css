@@ -1,108 +1,147 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-  }
-  
-  body {
-    display: flex;
-    justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f9f9f9, #e3e3e3);
-  }
-  
-  .container {
-    display: flex;
-    width: 100%;
-    max-width: 1200px;
-    height: 100vh;  /* Impostato per coprire tutta la pagina */
-  }
-  
-  .left-panel, .right-panel {
-    width: 50%;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  
-  .left-panel {
-    border-right: 2px solid #ddd;  /* Linea di separazione */
-  }
-  
-  .search-box {
-    margin-bottom: 20px;
-  }
-  
-  #keywordInput {
-    width: 100%;
-    padding: 10px;
-    font-size: 18px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .search-button {
-    width: 100%;
-    padding: 12px 30px;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    background: #4a90e2;
-    color: white;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .search-button:hover {
-    background: #357ab7;
-  }
-  
-  .highlighted-preview {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #333;
-    text-align: left;
-  }
-  
-  .highlighted-preview span {
-    display: inline-block;
-    margin-right: 10px;
-  }
-  
-  .summary h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  #summaryText {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #333;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  
-  .right-panel .preview-box {
-    height: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  iframe {
-    width: 100%;
-    height: 500px;
-    border: none;
-  }
-  
-/* Stile per le parole evidenziate */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9f9f9, #e3e3e3);
+}
+
+header {
+  width: 100%;
+  background-color: #4a90e2;
+  padding: 10px 0; /* Barra piccola */
+  text-align: center;
+}
+
+.logo-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+
+h1 {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1200px;
+  height: 100vh; /* Impostato per coprire tutta l'altezza della pagina */
+}
+
+.left-panel, .right-panel {
+  width: 50%;  /* Suddivide la pagina a metà */
+  padding: 20px;
+  height: 100%;  /* Assicura che i pannelli occupino tutta l'altezza della finestra */
+  overflow-y: auto;
+}
+
+.left-panel {
+  border-right: 2px solid #ddd;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+#keywordInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.search-button {
+  width: 100%;
+  padding: 12px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-button:hover {
+  background: #357ab7;
+}
+
+.highlighted-preview {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #333;
+  text-align: left;
+}
+
+.highlighted-preview span {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.summary h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+#summaryText {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.right-panel .preview-box {
+  height: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 .highlighted {
-    background-color: #e0e0e0;
-    padding: 2px 8px;
-    border-radius: 5px;
-    margin-right: 5px;
+  background-color: #e0e0e0;
+  padding: 2px 8px;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
+/* Media query per dispositivi piccoli */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Imposta una colonna invece di una riga */
   }
+
+  .left-panel, .right-panel {
+    width: 100%;  /* Occupano il 100% della larghezza */
+    padding: 10px;
+  }
+}
