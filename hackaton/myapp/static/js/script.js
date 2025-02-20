@@ -4,6 +4,7 @@ const dropArea = document.querySelector(".drag-area"),
   browseButton = document.getElementById("browseButton"),
   fileInput = document.getElementById("fileInput"),
   uploadForm = document.getElementById("uploadForm"),
+  submitButton = document.getElementById("submitButton"),
   resultArea = document.getElementById("result"),
   extractedText = document.getElementById("extractedText");
 
@@ -17,7 +18,6 @@ fileInput.addEventListener("change", function () {
   file = this.files[0];
   dropArea.classList.add("active");
   showFile(); // Calling function
-  uploadFile(); // Automatically upload the file after selection
 });
 
 // If user drags file over DropArea
@@ -38,7 +38,6 @@ dropArea.addEventListener("drop", (event) => {
   event.preventDefault(); // Preventing from default behaviour
   file = event.dataTransfer.files[0];
   showFile(); // Calling function
-  uploadFile(); // Automatically upload the file after drop
 });
 
 function showFile() {
@@ -54,8 +53,12 @@ function showFile() {
   }
 }
 
-function uploadFile() {
-  if (!file) return;
+// Submit the form when the "INVIA" button is clicked
+submitButton.addEventListener("click", () => {
+  if (!file) {
+    alert("Please select a file first.");
+    return;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
@@ -68,8 +71,8 @@ function uploadFile() {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        resultArea.style.display = "block";
-        extractedText.textContent = data.extracted_text;
+        // Redirect to result.html with the extracted text
+        window.location.href = `/result?extracted_text=${encodeURIComponent(data.extracted_text)}`;
       } else {
         alert(data.error || "An error occurred while processing the file.");
       }
@@ -78,4 +81,4 @@ function uploadFile() {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
     });
-}
+});

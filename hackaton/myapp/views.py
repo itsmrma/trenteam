@@ -90,8 +90,8 @@ def upload_file(request):
             return JsonResponse({"success": False, "error": "Invalid form submission."})
     else:
         form = UploadFileForm()
-    return render(request, 'result.html', {'form': form})
+    return render(request, 'upload.html', {'form': form})
 
 def result(request):
-    
-    return render(request, 'result.html')
+    extracted_text = request.GET.get('extracted_text', '')
+    return render(request, 'result.html', {'extracted_text': extracted_text})
