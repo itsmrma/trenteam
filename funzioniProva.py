@@ -62,8 +62,12 @@ def file_type(original_file_bytes):
     file_type = magic.from_buffer(original_file_bytes, mime=True)
     return file_type
 
-file=[]
-#print(file_type(extract_original_file("file/tabella guida risposte pag 5.jpeg.p7m")))
-file.append((extract_original_file("file/tabella guida risposte pag 5.jpeg.p7m"),file_type(extract_original_file("file/tabella guida risposte pag 5.jpeg.p7m")))) #Sostituisci il percorso
-file.append((extract_original_file("file/SINTESI NON TECNICA.pdf.p7m"),file_type(extract_original_file("file/SINTESI NON TECNICA.pdf.p7m")))) #Sostituisci il percorso
-inviaRichiesta(file,"","")
+ciao="askaksakls.pdf 3"
+
+text = ""
+if file_type == 'application/pdf':
+    temp=ciao.split(".pdf")
+    if len(temp)==2:
+        ciao=temp[0]
+
+print(ciao)

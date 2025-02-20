@@ -1,18 +1,18 @@
 document.getElementById('keywordInput').addEventListener('input', function() {
-    const inputText = document.getElementById('keywordInput').value;
-  
-    // Separare le parole dalla virgola
-    const keywords = inputText.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
-  
-    // Creare una stringa HTML con le parole evidenziate
-    const highlightedKeywords = keywords.map(keyword => `<span class="highlighted">${keyword}</span>`).join(' ');
-  
-    // Mostra l'elenco separato da virgola nell'input
-    document.getElementById('keywordInput').value = keywords.join(', ');
-  
-    // Aggiornare la visualizzazione nell'anteprima delle parole evidenziate
-    document.getElementById('keywordPreview').innerHTML = highlightedKeywords;
-  });
+  const inputText = document.getElementById('keywordInput').value;
+
+  // Separare le parole dalla virgola
+  const keywords = inputText.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
+
+  // Creare una stringa HTML con le parole evidenziate
+  const highlightedKeywords = keywords.map(keyword => `<span class="highlighted">${keyword}</span>`).join(' ');
+
+  // Mostra l'elenco separato da virgola nell'input
+  document.getElementById('keywordInput').value = keywords.join(', ');
+
+  // Aggiornare la visualizzazione nell'anteprima delle parole evidenziate
+  document.getElementById('keywordPreview').innerHTML = highlightedKeywords;
+});
   
   // Aggiungi un listener per gestire il comportamento della virgola
   document.getElementById('keywordInput').addEventListener('keyup', function(event) {

@@ -66,6 +66,7 @@ def home(request):
         filename = fs.save(uploaded_file.name, uploaded_file)  # Salva il file
         file_url = fs.url(filename)  # Ottiene l'URL del file salvato
         filename= urllib.parse.unquote(filename)
+        
         file_url = maneskin_url + urllib.parse.unquote(file_url)
 
 
@@ -84,15 +85,31 @@ def home(request):
 
         text = ""
         if file_type == 'application/pdf':
-            temp=filename.split(".pdf")
+            temp=file_url.split(".pdf")
             if len(temp)==2:
-                filename=temp[0]
-        print(filename)
-            
+                file_url=temp[0]
+            file_url+=".pdf"
+        elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            temp=file_url.split(".docx")
+            if len(temp)==2:
+                file_url=temp[0]
+            file_url+=".docx"
+        elif file_type == 'image/jpeg':
+            temp=file_url.split(".jpeg")
+            if len(temp)==2:
+                file_url=temp[0]
+            file_url+=".jpeg"
+        elif file_type == 'image/png':
+            temp=file_url.split(".png")
+            if len(temp)==2:
+                file_url=temp[0]
+            file_url+=".png"
+        print("DIOCANE"+file_url)
         
         with open(file_url.replace(".p7m",""), "wb") as file:
             file.write(byteFile)
         
+
         
         
         # Extract text based on file type
@@ -104,10 +121,12 @@ def home(request):
         elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             text = extract_text_from_docx(file_url)
         riassunto=''
-        #riassunto=inviaRichiesta('',text,'','Riassumi questo testo:')
-        #print(riassunto)
-        pdf_path = request.build_absolute_uri(settings.MEDIA_URL + "hackaton.pdf")
-    
+        riassunto=inviaRichiesta('',text,'','IN LINGUA ITALIANA. Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Mantieni il tono originale del documento e assicurati che il riassunto sia chiaro e coerente. Se non hai parole chiave, riassumi tutto il contenuto del documento.')
+        print(riassunto)
+        filename = urllib.parse.unquote(filename)
+        
+        pdf_path = request.build_absolute_uri(settings.MEDIA_URL + filename)
+
         return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path})  # Mostra il file
 
     return render(request, 'upload.html')  # Se non c'è file, mostra solo il form
@@ -122,7 +141,13 @@ def inviaRichiesta(file,testo,keywords,testoPreliminare):
         for i in file:
             file_mime.update({"mime_type": i[1], "data": i[0]})
     model = genai.GenerativeModel('gemini-2.0-flash')
-    testo=testoPreliminare+testo
+    if(keywords!=''):
+        temp=''
+        for i in keywords:
+            temp+=i+','
+        testoPreliminare=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]',temp)
+    else:
+        testoPreliminare=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]','')
     prompt_parts = [
         testo
         #{"mime_type": "image/jpeg", "data": immagini}
@@ -160,3 +185,7 @@ def file_type(original_file_bytes):
     file_type = magic.from_buffer(original_file_bytes, mime=True)
     return file_type
 	
+
+def result (request):
+    
+    return render(request, 'result.html')
