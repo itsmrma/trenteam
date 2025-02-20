@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from .models import Documento
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import magic
@@ -60,7 +61,7 @@ from django.core.files.storage import FileSystemStorage
 
 def home(request):
     if request.method == 'POST' and request.FILES.get('file'):
-        maneskin_url = "/home/mbenassi/Documents/Hackaton/trenteam/hackaton"
+        maneskin_url = "D:/hackathon/gitHub/trenteam/hackaton"
         uploaded_file = request.FILES['file']  # Ottiene il file inviato
         fs = FileSystemStorage()
         filename = fs.save(uploaded_file.name, uploaded_file)  # Salva il file
@@ -122,11 +123,11 @@ def home(request):
             text = extract_text_from_docx(file_url)
         riassunto=''
         riassunto=inviaRichiesta('',text,'','Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
-        print(riassunto)
         filename = urllib.parse.unquote(filename)
         
         pdf_path = request.build_absolute_uri(settings.MEDIA_URL + filename)
-
+        request.session["file_url"]=file_url
+        request.session["pdf_url"]=pdf_path
         return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':ParoleChiave(),"testo":text})  # Mostra il file
 
     return render(request, 'upload.html')  # Se non c'è file, mostra solo il form
@@ -135,29 +136,23 @@ def home(request):
 
 def inviaRichiesta(file,testo,keywords,testoPreliminare):
     import google.generativeai as genai
-    file_mime={}
     genai.configure(api_key="AIzaSyATCyWtU-wJMO97rPf7xHr0pOJrgTEE8ds") #Sostituisci con la tua chiave API
-    if(file!=''):
-        for i in file:
-            file_mime.update({"mime_type": i[1], "data": i[0]})
+
     model = genai.GenerativeModel('gemini-2.0-flash')
     if(keywords!=''):
-        temp=''
-        for i in keywords:
-            temp+=i+','
-        testoPreliminare=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]',temp)
+        testo=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]',keywords)+testo
     else:
-        testoPreliminare=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]','')
+        testo=testoPreliminare.replace('[INSERIRE PAROLE CHIAVE]','')+testo
+    
     prompt_parts = [
         testo
         #{"mime_type": "image/jpeg", "data": immagini}
     ]
     if(file!=''):
-        prompt_parts.append(file_mime)
+        prompt_parts.append({"mime_type": "application/pdf", "data": file})
     response = model.generate_content(prompt_parts)
 
     return response.text
-    #print(prompt_parts)
 
 def extract_original_file(p7m_file_path):
     with open(p7m_file_path, 'rb') as f:
@@ -194,11 +189,30 @@ def result(request):
         
         if form.is_valid():  # Controlla se i dati sono validi
             paroleChiave = form.cleaned_data['message']
-            pdf_path = form.cleaned_data['pdf_path']
+            file_url = request.session.get("file_url", "Nessun dato salvato")
+            pdf_path = request.session.get("pdf_url", "Nessun dato salvato")
+
+            print(file_url)
             print(pdf_path)
-            #riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+
+            file_type = magic.from_file(file_url, mime=True)
+
+
+            text = ""
+            if file_type == 'application/pdf':
+                text = extract_text_from_pdf(file_url)
+            elif file_type in ['image/jpeg', 'image/png']:
+                text = extract_text_from_image(file_url)
+            elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                text = extract_text_from_docx(file_url)
+            Documento.objects.create(pdf_path=pdf_path, parole_chiave=paroleChiave, file_url=file_url)
+            riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
             # Puoi fare qualcosa con i dati, come salvarli nel database o inviare un'email
-            print("Parole chiave",paroleChiave)
-            #return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})  # Mostra il file
+            return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})  # Mostra il file
 
     return render(request, 'result.html', {'form': form})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)
+
+def cronologia(request):
+    documenti = Documento.objects.all()
+
+    return render(request, 'cronologia.html',{'documenti',documenti})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)

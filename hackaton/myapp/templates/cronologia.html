@@ -1,0 +1,31 @@
+<html>
+    <body>
+        <h1>Cronologia</h1>
+        <table>
+            <tr>
+              <th>Intestazione 1</th>
+              <th>Intestazione 2</th>
+            </tr>
+            <tr>
+              <td>Riga 1, Cella 1</td>
+              <td>Riga 1, Cella 2</td>
+            </tr>
+          </table>
+        <table>
+        {% for temp in documenti %}
+            <tr>
+                {{temp.id}}
+            </tr>
+            <tr>
+                {{temp.pdf_path}}
+            </tr>
+            <tr>
+                {{temp.parole_chiave}}
+            </tr>
+            <tr>
+                {{temp.file_url}}
+            </tr>
+        {% endfor %}
+        </table>
+    </body>
+</html>
