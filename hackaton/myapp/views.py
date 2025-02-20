@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from .forms import UploadFileForm
 import magic
 from PyPDF2 import PdfReader
 from PIL import Image
@@ -12,6 +11,7 @@ from asn1crypto import cms, pem
 from django.core.files.storage import FileSystemStorage
 import urllib.parse
 import os
+from .forms import ParoleChiave
 from django.conf import settings
 
 def extract_text_from_pdf(file_path):
@@ -121,13 +121,13 @@ def home(request):
         elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             text = extract_text_from_docx(file_url)
         riassunto=''
-        riassunto=inviaRichiesta('',text,'','IN LINGUA ITALIANA. Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Mantieni il tono originale del documento e assicurati che il riassunto sia chiaro e coerente. Se non hai parole chiave, riassumi tutto il contenuto del documento.')
+        riassunto=inviaRichiesta('',text,'','Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
         print(riassunto)
         filename = urllib.parse.unquote(filename)
         
         pdf_path = request.build_absolute_uri(settings.MEDIA_URL + filename)
 
-        return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path})  # Mostra il file
+        return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':ParoleChiave(),"testo":text})  # Mostra il file
 
     return render(request, 'upload.html')  # Se non c'è file, mostra solo il form
 
@@ -186,6 +186,19 @@ def file_type(original_file_bytes):
     return file_type
 	
 
-def result (request):
-    
-    return render(request, 'result.html')
+def result(request):
+    form = ParoleChiave()  # Crea un'istanza vuota del form
+
+    if request.method == "POST":
+        form = ParoleChiave(request.POST)  # Riempie il form con i dati inviati
+        
+        if form.is_valid():  # Controlla se i dati sono validi
+            paroleChiave = form.cleaned_data['message']
+            pdf_path = form.cleaned_data['pdf_path']
+            print(pdf_path)
+            #riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+            # Puoi fare qualcosa con i dati, come salvarli nel database o inviare un'email
+            print("Parole chiave",paroleChiave)
+            #return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})  # Mostra il file
+
+    return render(request, 'result.html', {'form': form})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)

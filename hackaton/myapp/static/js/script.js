@@ -54,3 +54,7 @@ function showFile() {
 }
 
 
+function showLoading() {
+  let s = "<div class='blue ball'> </div><div class='red ball'></div>  <div class='yellow ball'></div> <div class='green ball'></div>";
+  document.getElementById("loading").innerHTML = s;  
+}

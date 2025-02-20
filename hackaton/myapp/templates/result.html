@@ -32,15 +32,20 @@
     
     <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/2 flex flex-col">
       <h2 class="text-lg font-semibold mb-4">Parole chiave</h2>
-      <input type="text" id="keywordInput" placeholder="Inserisci parole chiave..." class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button id="searchButton" class="w-full mt-3 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Cerca</button>
+      <form id="keywordForm" class="w-full flex flex-col" method="POST" action="{% url 'result' %}">
+        {% csrf_token %}
+        {{ form.message }}
+        {{ form.pdf_path }}
+        {{ form.file_url }}
+        {{ form.testo }}
+        <input type="text" id="keywordInput" name="keywords" placeholder="Inserisci parole chiave... (separate da una virgola)" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" class="w-full mt-3 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Cerca</button>
+      </form>
       <div class="mt-4 text-gray-700" id="keywordPreview"></div>
       
       <div class="mt-6 flex-grow overflow-auto max-h-60 flex flex-col">
         <h2 class="text-lg font-semibold">Riassunto</h2>
-        <div class="flex-grow">
-          <pre id="summaryText" class="p-4 bg-gray-50 border rounded-lg text-gray-800 overflow-auto flex-grow">{{ Riassunto }}</pre>
-        </div>
+        <pre id="summaryText" class="p-4 bg-gray-50 border rounded-lg text-gray-800 overflow-auto flex-grow">{{ Riassunto }}</pre>
       </div>
     </div>
 
@@ -50,6 +55,11 @@
         <iframe src="{{ pdf_url }}" class="w-full h-full border rounded-lg"></iframe>
       </div>
     </div>
+  </div>
+  <div hidden>
+    <p id="testo">{{testo}}</p> 
+    <p id="_file_url">{{file_url}}</p> 
+    <p id="_pdf_path">{{pdf_url}}</p> 
   </div>
 
   <script src="{% static 'js/script_result.js' %}"></script>

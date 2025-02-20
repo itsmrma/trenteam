@@ -26,15 +26,13 @@
       
 
     <!-- Pulsante INVIA fuori dal box -->
-    <button class="submit-button" type="submit">INVIA</button>
+    <button class="submit-button" type="submit" onclick="showLoading()">INVIA</button>
       </form>
     </div>
-    <!-- Area per mostrare il testo estratto -->
-    <div id="result" class="result-area" style="display: none;">
-      <h2>Testo Estratto</h2>
-      <pre id="extractedText"></pre>
+
+    <div class="wrapper" id="loading">
+      
     </div>
-  </div>
 
   <script src="{% static 'js/script.js' %}"></script>
 </body>

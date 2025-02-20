@@ -28,3 +28,18 @@ document.getElementById('keywordInput').addEventListener('input', function() {
       }
     }
   });
+
+  //document.getElementById('id_message').class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  document.getElementById("id_pdf_path").hidden="true";
+  document.getElementById("id_file_url").hidden="true";
+  document.getElementById("id_testo").hidden="true";
+
+
+
+  document.getElementById("id_pdf_path").textContent=document.getElementById("_pdf_path").textContent;
+  document.getElementById("id_file_url").textContent=ocument.getElementById("_file_url").textContent;
+  document.getElementById("id_testo").textContent=document.getElementById("testo").textContent;
+
+  document.getElementById("testo").textContent;
+  document.getElementById("_file_url").textContent;
+  document.getElementById("_pdf_path").textContent;
