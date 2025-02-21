@@ -62,12 +62,16 @@ def file_type(original_file_bytes):
     file_type = magic.from_buffer(original_file_bytes, mime=True)
     return file_type
 
-ciao="askaksakls.pdf 3"
 
-text = ""
-if file_type == 'application/pdf':
-    temp=ciao.split(".pdf")
-    if len(temp)==2:
-        ciao=temp[0]
+def extract_text_from_docx(file_path):
+    import docx
+    doc = docx.Document(file_path)
+    text = "\n".join([para.text for para in doc.paragraphs])
+    return text
 
-print(ciao)
+
+
+bite=extract_original_file("D:/hackathon/file/tabella guida risposte pag 2.docx.p7m")
+with open("D:/hackathon/file/tabella guida risposte pag 2.docx.p7m".replace(".p7m",""), "wb") as file:
+    file.write(bite)
+print(extract_text_from_docx("D:/hackathon/file/tabella guida risposte pag 2.docx"))

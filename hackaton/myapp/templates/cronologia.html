@@ -1,31 +1,42 @@
 <html>
     <body>
         <h1>Cronologia</h1>
+        
         <table>
-            <tr>
-              <th>Intestazione 1</th>
-              <th>Intestazione 2</th>
-            </tr>
-            <tr>
-              <td>Riga 1, Cella 1</td>
-              <td>Riga 1, Cella 2</td>
-            </tr>
-          </table>
-        <table>
-        {% for temp in documenti %}
-            <tr>
-                {{temp.id}}
-            </tr>
-            <tr>
-                {{temp.pdf_path}}
-            </tr>
-            <tr>
-                {{temp.parole_chiave}}
-            </tr>
-            <tr>
-                {{temp.file_url}}
-            </tr>
+            <thead>
+                <tr>
+                  <th>id</th>
+                  <th>pdf_path</th>
+                  <th>parole_chiave</th>
+                  <th>file_url</th>
+                </tr>
+              </thead>
+              <tbody>
+        {% for documento in documenti %}
+        <tr>
+            {% if documento.id %}
+                <td >
+                    <a href="{% url 'resultRiferimento' documento.id %}">{{documento.id}}</a>
+                </td>
+            {% endif %}
+            {% if documento.pdf_path %}
+                <td>
+                    {{documento.pdf_path}}
+                </td>
+            {% endif %}
+            {% if documento.parole_chiave %}
+                <td>
+                    {{documento.parole_chiave}}
+                </td>
+            {% endif %}
+            {% if documento.file_url %}
+                <td>
+                    {{documento.file_url}}
+                </td>
+            {% endif %}
+        </tr>
         {% endfor %}
+        </tbody>
         </table>
     </body>
 </html>

@@ -8,4 +8,5 @@ urlpatterns = [
     path('result/', views.result, name='result'),
     path('cronologia/', views.cronologia, name='cronologia'),
     path('admin/', admin.site.urls),
+    path('result/<int:id>', views.resultId, name='resultRiferimento'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

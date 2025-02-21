@@ -15,6 +15,15 @@ import os
 from .forms import ParoleChiave
 from django.conf import settings
 
+import pytesseract
+#PER SIMONE TRENTIN FINOCCHIO
+pytesseract.pytesseract.tesseract_cmd = 'C:/Users/simon/AppData/Local/Programs/Tesseract-OCR/tesseract.exe'  # Sostituisci con il tuo percorso
+
+# Ora puoi usare pytesseract
+
+
+
+
 def extract_text_from_pdf(file_path):
     reader = PdfReader(file_path)
     text = ""
@@ -105,7 +114,6 @@ def home(request):
             if len(temp)==2:
                 file_url=temp[0]
             file_url+=".png"
-        print("DIOCANE"+file_url)
         
         with open(file_url.replace(".p7m",""), "wb") as file:
             file.write(byteFile)
@@ -186,6 +194,7 @@ def result(request):
 
     if request.method == "POST":
         form = ParoleChiave(request.POST)  # Riempie il form con i dati inviati
+        print("RICHIESTA",request.POST)
         
         if form.is_valid():  # Controlla se i dati sono validi
             paroleChiave = form.cleaned_data['message']
@@ -214,5 +223,30 @@ def result(request):
 
 def cronologia(request):
     documenti = Documento.objects.all()
+    print(type(documenti))
+    return render(request, 'cronologia.html',{'documenti':documenti})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)
 
-    return render(request, 'cronologia.html',{'documenti',documenti})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)
+def resultId(request,id):
+    documenti=Documento.objects.filter(id=id)
+    
+    paroleChiave=documenti[0].parole_chiave
+    dizionario={'message':documenti[0].parole_chiave}
+    file_url=documenti[0].file_url
+    pdf_path=documenti[0].pdf_path
+
+    file_type = magic.from_file(file_url, mime=True)
+
+
+    text = ""
+    if file_type == 'application/pdf':
+        text = extract_text_from_pdf(file_url)
+    elif file_type in ['image/jpeg', 'image/png']:
+        text = extract_text_from_image(file_url)
+    elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        text = extract_text_from_docx(file_url)
+
+    riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+
+    form = ParoleChiave(dizionario)
+    return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})
+    #return render(request, 'result.html', {'form': form})
