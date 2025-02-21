@@ -5,6 +5,7 @@ class Documento(models.Model):
     pdf_path = models.CharField(max_length=1000)  # Percorso del file PDF
     parole_chiave = models.CharField(max_length=1000)  # Stringa con parole chiave
     file_url = models.CharField(max_length=1000)  # Percorso del file PDF
+    nome_file= models.CharField(max_length=1000)  # Nome del file
 
 
     def __str__(self):

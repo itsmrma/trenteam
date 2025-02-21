@@ -7,13 +7,15 @@
     <title>AATO Smart Analyzer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <!-- Aggiungi il link per Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         #summaryText {
             height: 100%;
-            min-height: 100%;
+            min-height: 300px;
         }
     </style>
     <link rel="icon" type="image/png" href="{% static 'foto/aato_logo.png' %}">
@@ -30,7 +32,7 @@
 
   <div class="flex flex-col md:flex-row flex-grow p-6 space-y-6 md:space-y-0 md:space-x-6">
     
-    <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/2 flex flex-col">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/2 flex flex-col relative">
       <h2 class="text-lg font-semibold mb-4">Parole chiave</h2>
       <form id="keywordForm" class="w-full flex flex-col" method="POST" action="{% url 'result' %}">
         {% csrf_token %}
@@ -39,10 +41,25 @@
       </form>
       <div class="mt-4 text-gray-700" id="keywordPreview"></div>
       
-      <div class="mt-6 flex-grow overflow-auto max-h-60 flex flex-col">
+      <div class="flex-grow max-h-60 flex flex-col">
         <h2 class="text-lg font-semibold">Riassunto</h2>
-        <pre id="summaryText" class="p-4 bg-gray-50 border rounded-lg text-gray-800 overflow-auto flex-grow">{{ Riassunto }}</pre>
+        <pre id="summaryText" class="p-4 bg-gray-50 border rounded-lg text-gray-800 overflow-auto flex-grow min-h-70">{{ Riassunto }}</pre>
       </div>
+
+      <!-- Bottone Cronologia in basso a sinistra -->
+      <a href="{% url 'cronologia' %}">
+        <button class="absolute bottom-4 left-4 w-auto bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 transition">
+          <span class="material-icons">history</span>
+          <span>Cronologia</span>
+        </button>
+      </a>
+
+      <a href="{{ pdf_url }}" download>
+        <button class="absolute bottom-4 right-4 w-auto bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center space-x-2 transition">
+            <span class="material-icons">download</span>
+            <span>Scarica</span>
+        </button>
+      </a>
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/2 flex flex-col">

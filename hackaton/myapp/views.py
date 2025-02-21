@@ -1,45 +1,32 @@
-from django.http import JsonResponse
 from django.shortcuts import render
 from .models import Documento
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 import magic
-from PyPDF2 import PdfReader
-from PIL import Image
-import pytesseract
-import docx
 from asn1crypto import cms, pem
 from django.core.files.storage import FileSystemStorage
 import urllib.parse
-import os
+import io
 from .forms import ParoleChiave
-from django.conf import settings
-
-import pytesseract
-#PER SIMONE TRENTIN FINOCCHIO
-pytesseract.pytesseract.tesseract_cmd = 'C:/Users/simon/AppData/Local/Programs/Tesseract-OCR/tesseract.exe'  # Sostituisci con il tuo percorso
-
-# Ora puoi usare pytesseract
+from docx2pdf import convert
+import tempfile
+import os
 
 
+def docx_to_pdf_bytes(docx_bytes):
+    with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as docx_temp:
+        docx_temp.write(docx_bytes)
+        docx_path = docx_temp.name
 
+    pdf_bytes = io.BytesIO()
+    
+    try:
+        # Convert using temporary files
+        convert(docx_path, pdf_bytes)
+        pdf_bytes.seek(0)
+        return pdf_bytes.getvalue()
+    finally:
+        # Clean up temporary files
+        os.unlink(docx_path)
 
-def extract_text_from_pdf(file_path):
-    reader = PdfReader(file_path)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text()
-    return text
-
-def extract_text_from_image(file_path):
-    image = Image.open(file_path)
-    text = pytesseract.image_to_string(image)
-    return text
-
-def extract_text_from_docx(file_path):
-    doc = docx.Document(file_path)
-    text = "\n".join([para.text for para in doc.paragraphs])
-    return text
 
 def extract_original_file(p7m_file_path):
     with open(p7m_file_path, 'rb') as f:
@@ -70,7 +57,8 @@ from django.core.files.storage import FileSystemStorage
 
 def home(request):
     if request.method == 'POST' and request.FILES.get('file'):
-        maneskin_url = "D:/hackathon/gitHub/trenteam/hackaton"
+        import os
+        maneskin_url = os.getcwd()
         uploaded_file = request.FILES['file']  # Ottiene il file inviato
         fs = FileSystemStorage()
         filename = fs.save(uploaded_file.name, uploaded_file)  # Salva il file
@@ -82,9 +70,22 @@ def home(request):
 
         byteFile=extract_original_file(file_url)
         file_type = magic.from_buffer(byteFile, mime=True)
-        import os
-        from django.conf import settings
         
+        from django.conf import settings
+
+        if file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            # Pass the actual DOCX bytes to the converter
+            pdf_bytes = docx_to_pdf_bytes(byteFile)
+            
+            filename = filename.replace(".docx.p7m", ".pdf")
+            file_type = 'application/pdf'
+            file_url = file_url.replace(".docx.p7m", ".pdf")
+            
+            # Write the PDF bytes to file
+            with open(file_url, "wb") as file:
+                file.write(pdf_bytes)
+            
+            byteFile = pdf_bytes  # Update byteFile with the PDF content
         
         if os.path.exists(file_url):
             os.remove(file_url)
@@ -92,51 +93,19 @@ def home(request):
         filename=filename.replace(".p7m","")
         file_url=file_url.replace(".p7m","")
 
-
-        text = ""
-        if file_type == 'application/pdf':
-            temp=file_url.split(".pdf")
-            if len(temp)==2:
-                file_url=temp[0]
-            file_url+=".pdf"
-        elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            temp=file_url.split(".docx")
-            if len(temp)==2:
-                file_url=temp[0]
-            file_url+=".docx"
-        elif file_type == 'image/jpeg':
-            temp=file_url.split(".jpeg")
-            if len(temp)==2:
-                file_url=temp[0]
-            file_url+=".jpeg"
-        elif file_type == 'image/png':
-            temp=file_url.split(".png")
-            if len(temp)==2:
-                file_url=temp[0]
-            file_url+=".png"
         
         with open(file_url.replace(".p7m",""), "wb") as file:
             file.write(byteFile)
+            
         
-
-        
-        
-        # Extract text based on file type
-        text = ""
-        if file_type == 'application/pdf':
-            text = extract_text_from_pdf(file_url)
-        elif file_type in ['image/jpeg', 'image/png']:
-            text = extract_text_from_image(file_url)
-        elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            text = extract_text_from_docx(file_url)
         riassunto=''
-        riassunto=inviaRichiesta('',text,'','Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+        riassunto=inviaRichiesta((file_type,file_to_bytes(file_url)),'','','Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
         filename = urllib.parse.unquote(filename)
         
         pdf_path = request.build_absolute_uri(settings.MEDIA_URL + filename)
         request.session["file_url"]=file_url
         request.session["pdf_url"]=pdf_path
-        return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':ParoleChiave(),"testo":text})  # Mostra il file
+        return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':ParoleChiave()})  # Mostra il file
 
     return render(request, 'upload.html')  # Se non c'è file, mostra solo il form
 
@@ -157,7 +126,7 @@ def inviaRichiesta(file,testo,keywords,testoPreliminare):
         #{"mime_type": "image/jpeg", "data": immagini}
     ]
     if(file!=''):
-        prompt_parts.append({"mime_type": "application/pdf", "data": file})
+        prompt_parts.append({"mime_type": file[0], "data": file[1]})
     response = model.generate_content(prompt_parts)
 
     return response.text
@@ -205,26 +174,15 @@ def result(request):
             print(pdf_path)
 
             file_type = magic.from_file(file_url, mime=True)
-
-
-            text = ""
-            if file_type == 'application/pdf':
-                text = extract_text_from_pdf(file_url)
-            elif file_type in ['image/jpeg', 'image/png']:
-                text = extract_text_from_image(file_url)
-            elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                text = extract_text_from_docx(file_url)
-            Documento.objects.create(pdf_path=pdf_path, parole_chiave=paroleChiave, file_url=file_url)
-            riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+            file_name=file_url.split("/")[-1]
+            print("NOME",file_name)
+            
+            Documento.objects.create(pdf_path=pdf_path, parole_chiave=paroleChiave, file_url=file_url, nome_file=file_name)
+            riassunto=inviaRichiesta((file_type,file_to_bytes(file_url)),'',paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
             # Puoi fare qualcosa con i dati, come salvarli nel database o inviare un'email
-            return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})  # Mostra il file
+            return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form})  # Mostra il file
 
     return render(request, 'result.html', {'form': form})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)
-
-def cronologia(request):
-    documenti = Documento.objects.all()
-    print(type(documenti))
-    return render(request, 'cronologia.html',{'documenti':documenti})  # Mostra il form || INTEGRATO, Decisione di esecuzione (UE)
 
 def resultId(request,id):
     documenti=Documento.objects.filter(id=id)
@@ -237,16 +195,27 @@ def resultId(request,id):
     file_type = magic.from_file(file_url, mime=True)
 
 
-    text = ""
-    if file_type == 'application/pdf':
-        text = extract_text_from_pdf(file_url)
-    elif file_type in ['image/jpeg', 'image/png']:
-        text = extract_text_from_image(file_url)
-    elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-        text = extract_text_from_docx(file_url)
-
-    riassunto=inviaRichiesta('',text,paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
+    
+    riassunto=inviaRichiesta((file_type,file_to_bytes(file_url)),'',paroleChiave,'Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
 
     form = ParoleChiave(dizionario)
-    return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form,"testo":text})
+    return render(request, 'result.html', {'file_url': file_url,'Riassunto':riassunto, "pdf_url": pdf_path,'form':form})
     #return render(request, 'result.html', {'form': form})
+
+def file_to_bytes(file_path):
+    with open(file_path, "rb") as file:
+        return file.read()
+    
+def cronologia(request):
+    documenti = Documento.objects.all()
+    for documento in documenti:
+        if documento.pdf_path.endswith('.docx'):
+            documento.tipo_file = 'docx'
+        elif documento.pdf_path.endswith('.png'):
+            documento.tipo_file = 'png'
+        else:
+            documento.tipo_file = 'altro'
+    
+    return render(request, 'cronologia.html', {'documenti': documenti})
+
+
