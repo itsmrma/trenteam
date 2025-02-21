@@ -24,11 +24,19 @@
 <body class="bg-gray-100 flex flex-col min-h-screen">
   
   <header class="bg-blue-600 text-white p-4 shadow-md">
-    <div class="flex items-center justify-center">
-      <img src="{% static 'foto/aato_logo.png' %}" alt="AATO Logo" class="w-10 h-auto mr-3">
-      <h1 class="text-xl font-semibold">AATO Smart Analyzer</h1>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="{% static 'foto/aato_logo.png' %}" alt="AATO Logo" class="w-10 h-auto mr-3">
+        <h1 class="text-xl font-semibold">AATO Smart Analyzer</h1>
+      </div>
+      <a href="{% url 'home' %}">
+        <button class="bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 flex items-center space-x-2 transition">
+          <span class="material-icons">swap_horiz</span>
+          <span>Converti un altro file</span>
+        </button>
+      </a>
     </div>
-  </header>
+</header>
 
   <div class="flex flex-col md:flex-row flex-grow p-6 space-y-6 md:space-y-0 md:space-x-6">
     
@@ -37,7 +45,15 @@
       <form id="keywordForm" class="w-full flex flex-col" method="POST" action="{% url 'result' %}">
         {% csrf_token %}
         {{ form.message }}
-        <button type="submit" class="w-full mt-3 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Cerca</button>
+        <button type="submit" id="searchButton" class="w-full mt-3 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2">
+          <span id="buttonText">Cerca</span>
+          <span id="loadingSpinner" class="hidden">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 018 8h-4l3 3 3-3h-4a8 8 0 01-8 8v-4l-3 3 3 3v-4a8 8 0 01-8-8h4l-3-3-3 3h4z"></path>
+              </svg>
+          </span>
+      </button>
       </form>
       <div class="mt-4 text-gray-700" id="keywordPreview"></div>
       

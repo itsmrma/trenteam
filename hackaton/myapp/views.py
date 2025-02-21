@@ -11,22 +11,6 @@ import tempfile
 import os
 
 
-def docx_to_pdf_bytes(docx_bytes):
-    with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as docx_temp:
-        docx_temp.write(docx_bytes)
-        docx_path = docx_temp.name
-
-    pdf_bytes = io.BytesIO()
-    
-    try:
-        # Convert using temporary files
-        convert(docx_path, pdf_bytes)
-        pdf_bytes.seek(0)
-        return pdf_bytes.getvalue()
-    finally:
-        # Clean up temporary files
-        os.unlink(docx_path)
-
 
 def extract_original_file(p7m_file_path):
     with open(p7m_file_path, 'rb') as f:
@@ -74,29 +58,31 @@ def home(request):
         from django.conf import settings
 
         if file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            # Pass the actual DOCX bytes to the converter
-            pdf_bytes = docx_to_pdf_bytes(byteFile)
-            
-            filename = filename.replace(".docx.p7m", ".pdf")
-            file_type = 'application/pdf'
-            file_url = file_url.replace(".docx.p7m", ".pdf")
-            
-            # Write the PDF bytes to file
+            file_url = file_url.replace(".p7m", "")
+            filename = filename.replace(".p7m", "")
             with open(file_url, "wb") as file:
-                file.write(pdf_bytes)
+                file.write(byteFile)
             
-            byteFile = pdf_bytes  # Update byteFile with the PDF content
-        
-        if os.path.exists(file_url):
-            os.remove(file_url)
-        
-        filename=filename.replace(".p7m","")
-        file_url=file_url.replace(".p7m","")
+            filename = filename.replace(".docx", ".pdf")
+            print(filename)
+            dest = file_url.replace(".docx", ".pdf")
+            convert(file_url, dest)
 
-        
-        with open(file_url.replace(".p7m",""), "wb") as file:
-            file.write(byteFile)
+            file_type = 'application/pdf'
+            file_url = dest
+
+        else:
+            if os.path.exists(file_url):
+                os.remove(file_url)
             
+            filename=filename.replace(".p7m","")
+            file_url=file_url.replace(".p7m","")
+
+            
+            with open(file_url.replace(".p7m",""), "wb") as file:
+                file.write(byteFile)
+            
+
         
         riassunto=''
         riassunto=inviaRichiesta((file_type,file_to_bytes(file_url)),'','','Analizza il file PDF e identifica i concetti chiave basandoti sulle seguenti parole chiave: [INSERIRE PAROLE CHIAVE]. Per ogni concetto trovato, indica il numero della pagina di riferimento. Genera un riassunto dettagliato e strutturato in paragrafi, suddividendo le informazioni per argomento. Il riassunto deve essere scritto interamente in italiano, senza eccezioni, mantenendo il tono originale del documento. Non usare asterischi, trattini, Markdown o qualsiasi tipo di formattazione speciale; restituisci solo testo semplice senza simboli di markup. Se non hai parole chiave, riassumi interamente il documento.')
@@ -209,12 +195,18 @@ def file_to_bytes(file_path):
 def cronologia(request):
     documenti = Documento.objects.all()
     for documento in documenti:
-        if documento.pdf_path.endswith('.docx'):
+        if documento.pdf_path.endswith('.pdf'):
+            documento.tipo_file = 'pdf'
+            documento.icon = 'picture_as_pdf'  # Icona per PDF
+        elif documento.pdf_path.endswith('.docx'):
             documento.tipo_file = 'docx'
-        elif documento.pdf_path.endswith('.png'):
-            documento.tipo_file = 'png'
+            documento.icon = 'description'  # Icona per documenti
+        elif documento.pdf_path.endswith('.png') or documento.pdf_path.endswith('.jpg') or documento.pdf_path.endswith('.jpeg'):
+            documento.tipo_file = 'image'
+            documento.icon = 'image'  # Icona per immagini
         else:
             documento.tipo_file = 'altro'
+            documento.icon = 'insert_drive_file'  # Icona generica per altri file
     
     return render(request, 'cronologia.html', {'documenti': documenti})
 

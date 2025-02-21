@@ -31,4 +31,3 @@ document.getElementById('id_message').addEventListener('input', function() {
 
   document.getElementById('id_message').setAttribute("class","w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500");
   document.getElementById('id_message').setAttribute('placeholder', 'Inserisci parole chiave... (separate da una virgola)');
-

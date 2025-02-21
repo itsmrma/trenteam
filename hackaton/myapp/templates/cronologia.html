@@ -17,11 +17,19 @@
 <body class="bg-gray-100 flex flex-col min-h-screen">
   
   <header class="bg-blue-600 text-white p-4 shadow-md">
-    <div class="flex items-center justify-center">
-      <img src="{% static 'foto/aato_logo.png' %}" alt="AATO Logo" class="w-10 h-auto mr-3">
-      <h1 class="text-xl font-semibold">Cronologia</h1>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="{% static 'foto/aato_logo.png' %}" alt="AATO Logo" class="w-10 h-auto mr-3">
+        <h1 class="text-xl font-semibold">AATO Smart Analyzer</h1>
+      </div>
+      <a href="{% url 'home' %}">
+        <button class="bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 flex items-center space-x-2 transition">
+          <span class="material-icons">swap_horiz</span>
+          <span>Converti un altro file</span>
+        </button>
+      </a>
     </div>
-  </header>
+</header>
 
   <main class="flex-grow p-6">
     <div class="bg-white p-6 rounded-lg shadow-md">
@@ -29,47 +37,38 @@
       
       <table class="min-w-full table-auto border-collapse">
         <thead>
-          <tr class="bg-blue-100">
-            <th class="px-4 py-2 text-left font-semibold text-gray-700">TIPO</th>
-            <th class="px-4 py-2 text-left font-semibold text-gray-700">NOME FILE</th>
-            <th class="px-4 py-2 text-left font-semibold text-gray-700">PAROLE CHIAVE</th>
-            <th class="px-4 py-2 text-left font-semibold text-gray-700">FILE URL</th>
-          </tr>
+            <tr class="bg-blue-100">
+                <th class="px-4 py-2 text-left font-semibold text-gray-700">TIPO</th>
+                <th class="px-4 py-2 text-left font-semibold text-gray-700">NOME FILE</th>
+                <th class="px-4 py-2 text-left font-semibold text-gray-700">PAROLE CHIAVE</th>
+                <th class="px-4 py-2 text-left font-semibold text-gray-700">FILE URL</th>
+            </tr>
         </thead>
         <tbody>
-          {% if documenti %}
-            {% for documento in documenti %}
-            <tr class="hover:bg-gray-50">
-                {% if documento.id %}
-                    <td class="px-4 py-2">
-                        <a href="{% url 'resultRiferimento' documento.id %}" class="text-blue-600 hover:text-blue-800">
-                            <span class="material-icons">link</span> {{ documento.id }}
-                        </a>
+            {% if documenti %}
+                {% for documento in documenti %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 text-gray-800 flex items-center space-x-2">
+                        <span class="material-icons text-blue-600">{{ documento.icon }}</span>
+                        <span>{{ documento.tipo_file }}</span>
                     </td>
-                {% endif %}
-                {% if documento.pdf_path %}
                     <td class="px-4 py-2 text-gray-800">{{ documento.nome_file }}</td>
-                {% endif %}
-                {% if documento.parole_chiave %}
                     <td class="px-4 py-2 text-gray-800">{{ documento.parole_chiave }}</td>
-                {% endif %}
-                {% if documento.file_url %}
                     <td class="px-4 py-2 text-gray-800">
-                        <a href="{{ documento.file_url }}" class="text-blue-600 hover:text-blue-800" target="_blank">
-                            <span class="material-icons">open_in_new</span> Apri
-                        </a>
+                      <a href="{% url 'resultRiferimento' documento.id %}" class="text-blue-600 hover:text-blue-800">
+                        <span class="material-icons">open_in_new</span> Apri
+                      </a>
                     </td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-          {% endif %}
+                </tr>
+                {% endfor %}
+            {% endif %}
         </tbody>
-      </table>
+    </table>
     </div>
   </main>
 
   <footer class="bg-blue-600 text-white p-4 text-center">
-    <p>&copy; 2025 AATO Smart Analyzer. All rights reserved.</p>
+    <p>Creato da: Benassi Matteo - Cavallini Lorenzo - Trentin Simone</p>
   </footer>
 
 </body>

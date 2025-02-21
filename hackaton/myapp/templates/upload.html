@@ -1,39 +1,126 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AATO Smart Analyzer</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+        .drag-area {
+            border: 2px dashed #3b82f6;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .drag-over {
+            background-color: #bfdbfe;
+            border-color: #1d4ed8;
+        }
+    </style>
     <link rel="icon" type="image/png" href="{% static 'foto/aato_logo.png' %}">
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="{% static 'foto/aato_logo.png' %}" alt="Logo" class="logo">
-      <h1>AATO Smart Analyzer</h1>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="flex items-center justify-center">
+      <img src="{% static 'foto/aato_logo.png' %}" alt="AATO Logo" class="w-10 h-auto mr-3">
+      <h1 class="text-xl font-semibold">AATO Smart Analyzer</h1>
     </div>
+  </header>
 
-    <div class="drag-area">
-      <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
-      <header>Trascina e rilascia per caricare il file</header>
-      <span>OPPURE</span>
-      <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'home' %}">
-        {% csrf_token %}
-        <button type="button" id="browseButton">Sfoglia file</button>
-        <input type="file" name="file" id="fileInput" hidden accept=".p7m">
-      
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow flex items-center justify-center p-6">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg text-center">
+      <h2 class="text-lg font-semibold mb-4 text-blue-600">Carica il tuo file</h2>
 
-    <!-- Pulsante INVIA fuori dal box -->
-    <button class="submit-button" type="submit" onclick="showLoading()">INVIA</button>
-      </form>
+      <!-- Area di Drag & Drop -->
+      <div id="dragDropArea" class="drag-area p-6 rounded-lg flex flex-col items-center space-y-4 bg-gray-50">
+        <span class="material-icons text-blue-600 text-4xl">cloud_upload</span>
+        <p class="text-gray-700">Trascina e rilascia il file qui</p>
+        <span class="text-gray-500">OPPURE</span>
+
+        <!-- Form di Upload -->
+        <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'home' %}">
+          {% csrf_token %}
+          <input type="file" name="file" id="fileInput" hidden accept=".p7m">
+          <label for="fileInput" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+            Sfoglia file
+          </label>
+          <p id="fileName" class="text-gray-700 mt-2 hidden"></p> <!-- Mostra nome file caricato -->
+
+          <button type="submit" id="submitButton" class="w-full mt-4 bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition">
+            INVIA
+          </button>
+        </form>
+
+        <!-- Icona di caricamento -->
+        <div id="loadingSpinner" class="hidden mt-4 flex items-center space-x-2 text-blue-600">
+          <span class="material-icons animate-spin">autorenew</span>
+          <span>Caricamento...</span>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <div class="wrapper" id="loading">
-      
-    </div>
+  <!-- FOOTER -->
+  <footer class="bg-blue-600 text-white p-4 text-center">
+    <p>Creato da: Benassi Matteo - Cavallini Lorenzo - Trentin Simone</p>
+  </footer>
 
-  <script src="{% static 'js/script.js' %}"></script>
+  <!-- SCRIPT -->
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const dragDropArea = document.getElementById('dragDropArea');
+    const uploadForm = document.getElementById('uploadForm');
+    const submitButton = document.getElementById('submitButton');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    // Mostra il nome del file caricato
+    fileInput.addEventListener('change', function(event) {
+      if (event.target.files.length > 0) {
+        fileNameDisplay.textContent = "File selezionato: " + event.target.files[0].name;
+        fileNameDisplay.classList.remove('hidden');
+      } else {
+        fileNameDisplay.classList.add('hidden');
+      }
+    });
+
+    // Gestione drag & drop
+    dragDropArea.addEventListener('dragover', function(event) {
+      event.preventDefault();
+      dragDropArea.classList.add('drag-over');
+    });
+
+    dragDropArea.addEventListener('dragleave', function() {
+      dragDropArea.classList.remove('drag-over');
+    });
+
+    dragDropArea.addEventListener('drop', function(event) {
+      event.preventDefault();
+      dragDropArea.classList.remove('drag-over');
+
+      if (event.dataTransfer.files.length > 0) {
+        fileInput.files = event.dataTransfer.files;
+        fileNameDisplay.textContent = "File selezionato: " + event.dataTransfer.files[0].name;
+        fileNameDisplay.classList.remove('hidden');
+      }
+    });
+
+    // Mostra icona di caricamento quando si invia il form
+    uploadForm.addEventListener('submit', function() {
+      submitButton.classList.add('hidden'); // Nasconde il pulsante INVIA
+      loadingSpinner.classList.remove('hidden'); // Mostra caricamento
+    });
+  </script>
+
 </body>
 </html>
